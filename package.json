@@ -1,0 +1,21 @@
+{
+  "name": "fromscratch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.5.3",
+    "angular-ui-router": "^1.0.0-alpha.1",
+    "body-parser": "^1.15.0",
+    "bootstrap": "^3.3.6",
+    "express": "^4.13.4",
+    "morgan": "^1.7.0",
+    "nodemon": "^1.9.1"
+  }
+}
