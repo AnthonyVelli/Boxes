@@ -1,22 +1,32 @@
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+var canvasWidth = 560;
+var canvasHeight = 560;
+var x = 0;
+var topwall = 0;
+var bottwall = 555;
+var leftwall = 0;
+var rightwall = 555;
+var objs = [];
 
+var wallHitCheck = function(obj){
+	if (obj.loc[1] + obj.leng >= bottwall || obj.loc[1] <= topwall){
+		obj.traj[1] *= -1;
+	}
+	if (obj.loc[0] + obj.leng >= rightwall || obj.loc[0] <= leftwall){
+		obj.traj[0] *= -1;
+	}
+};
 
 var changeTraj = function(collidedObj, obj){
-	if (collidedObj.traj[0] === null){
-		console.log(collidedObj);
-		xVelocityTransfer = 0;
-	} else {
-		objXvelocity = obj.traj[0] * obj.speed[0];
-		collidedObjXvelocity = collidedObj.traj[0] * collidedObj.speed[0];
-		xVelocityTransfer = Math.abs(objXvelocity - collidedObjXvelocity);		
-	}
 
-	if (collidedObj.traj[1] === null){
-		yVelocityTransfer = 0;
-	} else {
-		objYvelocity = obj.traj[1] * obj.speed[1];
-		collidedObjYvelocity = collidedObj.traj[1] * collidedObj.speed[1];
-		yVelocityTransfer = Math.abs(objYvelocity - collidedObjYvelocity);	
-	}
+	objXvelocity = obj.traj[0] * obj.speed[0];
+	collidedObjXvelocity = collidedObj.traj[0] * collidedObj.speed[0];
+	xVelocityTransfer = Math.abs(objXvelocity - collidedObjXvelocity);		
+	objYvelocity = obj.traj[1] * obj.speed[1];
+	collidedObjYvelocity = collidedObj.traj[1] * collidedObj.speed[1];
+	yVelocityTransfer = Math.abs(objYvelocity - collidedObjYvelocity);	
+	
 
 	if (xVelocityTransfer >= 1) {
 		collidedObj.traj[0] *= -1;
@@ -26,9 +36,6 @@ var changeTraj = function(collidedObj, obj){
 		collidedObj.traj[1] *= -1;
 		obj.traj[1] *= -1;
 	}
-
-
-
 };
 
 var moving = function(obj){
@@ -38,74 +45,73 @@ var moving = function(obj){
 		return false;
 };
 
-var hitDetection = function(otherObj, movingObj){
-	if (movingObj.id === otherObj.id){return false};
-	if (!moving(movingObj) || !moving(otherObj)) {
-		if (otherObj.loc[0] !== null && movingObj.loc[0] + movingObj.leng >= otherObj.loc[0] && otherObj.loc[0] >= movingObj.loc[0]) {
-			return true;
-		} else if (movingObj.loc[1] + movingObj.leng >= otherObj.loc[1] && otherObj.loc[1] >= movingObj.loc[1]) {
+var hitDetection = function(collidedObjCheck, movingObj){
+	if (movingObj.loc[0] + movingObj.leng >= collidedObjCheck.loc[0] && collidedObjCheck.loc[0] >= movingObj.loc[0]){
+		 if (movingObj.loc[1] + movingObj.leng >= collidedObjCheck.loc[1] && collidedObjCheck.loc[1] >= movingObj.loc[1]) {
+			changeTraj(collidedObjCheck, movingObj);
 			return true;
 		}
-		return false;
-	}
-	if (movingObj.loc[0] + movingObj.leng >= otherObj.loc[0] && otherObj.loc[0] >= movingObj.loc[0]){
-			 if (movingObj.loc[1] + movingObj.leng >= otherObj.loc[1] && otherObj.loc[1] >= movingObj.loc[1]) {
-				return true;
-			}
-		}
-	if (otherObj.loc[0] + otherObj.leng >= movingObj.loc[0] && movingObj.loc[0] >= otherObj.loc[0]){
-		 if (otherObj.loc[1] + otherObj.leng >= movingObj.loc[1] && movingObj.loc[1] >= otherObj.loc[1]) {
+	} else if (collidedObjCheck.loc[0] + collidedObjCheck.leng >= movingObj.loc[0] && movingObj.loc[0] >= collidedObjCheck.loc[0]){
+		 if (collidedObjCheck.loc[1] + collidedObjCheck.leng >= movingObj.loc[1] && movingObj.loc[1] >= collidedObjCheck.loc[1]) {
+			changeTraj(collidedObjCheck, movingObj);
 			return true;
 		}
 	}
 };
 
-var occupiedSpace = function(){
 
+var occupiedSpace = function(spot, axis){
+	var foundObj = objs.find(function(ele){
+		return ele.loc[axis] + ele.leng >= spot && spot >= ele.loc[axis];	
+	});
+	if (foundObj) {return true} else {return false}
+};
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
 }
-
+var x = 0;
 var draw = function(){
+	console.log(x);
 	ctx.clearRect(0,0,600, 600);
 	ctx.save();
-	var movingObjs = objs.filter(function(obj) {return obj.traj[0] || obj.traj[1]});
-	movingObjs.forEach(function(obj, idx){
+	objs.forEach(function(obj, idx){
 		ctx.fillStyle = obj.col;
-		ctx.translate(obj.loc[0] += obj.traj[0], obj.loc[1] += obj.traj[1]); 
-		ctx.fillRect(0,0, obj.leng, obj.leng);
-		var collidedObj = objs.find(objComp => hitDetection(objComp, obj));
-		if (collidedObj) {
-			changeTraj(collidedObj, obj);
-		}
-		
-		ctx.setTransform(1,0,0,1,0,0);
+		ctx.fillRect(obj.loc[0] += obj.traj[0], obj.loc[1] += obj.traj[1], obj.leng, obj.leng);
+		wallHitCheck(obj);
+		objs.find(function(collidedObjCheck, idxCheck){
+			return idx !== idxCheck && hitDetection(collidedObjCheck, obj);	
+		}); 
 		ctx.restore();
 	});
-
+	x++;
   	window.requestAnimationFrame(draw);
 };
 
-
-var canvas = document.getElementById('canvas');
-var ctx = canvas.getContext('2d');
-var canvasWidth = 560;
-var canvasHeight = 560;
-var x = 0;
-var topwall = {id: 1, col: null, loc: [null, 0], speed: [0, 0], traj: [null, 0], leng: canvasHeight};
-var bottwall = {id: 2, col: null, loc: [null, 555], speed: [0, 0], traj: [null, 0], leng: canvasHeight};
-var leftwall = {id: 3, col: null, loc: [0, null], speed: [0, 0], traj: [0, null], leng: canvasWidth};
-var rightwall = {id: 4, col: null, loc: [555, null], speed: [0, 0], traj: [0, null], leng: canvasWidth};
-var objs = [topwall, bottwall, leftwall, rightwall];
-for (var x = 5; x < 33; x++){
-	var randomSize = Math.random() * 50;
-	var randomY = Math.random() * (canvasWidth - randomSize - 5);
-	var randomX = Math.random() * (canvasHeight - randomSize - 5);
-	var randomYTraj;
-	var randomXTraj;
-	Math.random() > .5 ? randomYTraj = 1 : randomYTraj = -1;
-	Math.random() > .5 ? randomXTraj = 1 : randomXTraj = -1;
-	objs.push({id: x, col: '#'+Math.floor(Math.random()*16777215).toString(16), loc: [randomX, randomY], speed: [1,1], traj:[randomXTraj, randomYTraj], leng: randomSize })
-}
-
+var start = function(){
+	for (var x = 5; x < 15; x++){
+		console.log('doin it');
+		var randomSize = getRandomInt(0, 50);
+		console.log(randomSize);
+		randomY = getRandomInt(0, canvasHeight - randomSize - 5);
+		while (occupiedSpace(randomY, 1)){
+			console.log('doin it');
+			randomY = getRandomInt(0, canvasHeight - randomSize - 5);
+		}
+		randomX = getRandomInt(0, canvasWidth - randomSize - 5);
+		while (occupiedSpace(randomX), 0){
+			randomX = getRandomInt(0, canvasWidth - randomSize - 5);
+		}
+		var randomYTraj;
+		var randomXTraj;
+		Math.random() > .5 ? randomYTraj = 1 : randomYTraj = -1;
+		Math.random() > .5 ? randomXTraj = 1 : randomXTraj = -1;
+		objs.push({id: x, col: '#'+Math.floor(Math.random()*16777215).toString(16), loc: [randomX, randomY], speed: [1,1], traj:[randomXTraj, randomYTraj], leng: randomSize });
+	}
 
 
-window.requestAnimationFrame(draw);
+
+	window.requestAnimationFrame(draw);
+};
+
+start();
