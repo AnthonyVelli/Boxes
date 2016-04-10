@@ -131,7 +131,7 @@ Circle.prototype.randomLoc = function() {
 
 
 Circle.prototype.clear = function(){
-	ctx.clearRect(this.loc[0] - this.radius, this.loc[1] - this.radius, this.loc[0] + this.radius * 2, this.loc[0] + this.radius * 2);
+	ctx.clearRect(this.loc[0] - this.radius, this.loc[1] - this.radius, this.radius * 2, this.radius * 2);
 };
 
 Circle.prototype.extremities = function(){
@@ -149,7 +149,6 @@ Circle.prototype.circumPoints = function(){
 
 
 Circle.prototype.moveDraw = function(){
-	debugger;
 	ctx.beginPath();
 	ctx.fillStyle = this.col;
 	ctx.arc(this.loc[0] += this.traj[0],this.loc[1] += this.traj[1],this.radius,0,2*Math.PI);
