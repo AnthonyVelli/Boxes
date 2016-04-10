@@ -2,34 +2,16 @@
 <html lang="en">
 	<head>
 		<title>Trying to remember</title>
-		<link href="/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
-		<link href="/templates/canvas.css" rel="stylesheet"/>
+		<script src="/templates/canvas.js"></script>
+		<script src="/templates/shapeCreator.js"></script>
 	</head>
 
 	<body >
-		<form name="newPlayer">
-			<fieldset class="form-group">
-				<input id = "inputbox" ng-model="name" type="text" placeholder="How many BOXES?">
-			</fieldset>
-			<button type="submit" class="btn btn-primary" onclick="createBoxes()">Submit name</button>
-		</form>
-		<div class="row">
-			<div class="col-md-1">
-			content
-			</div>
-			<div class="col-md-5">
-			content
-			</div>
-			<div class="col-md-5">
-			content
-			</div>
-			<div class="col-md-1">
-			content
-			</div>
-		</div>	
+			<input id = "inputbox" type="text" placeholder="How many BOXES?">
+			<button onclick="start()">Submit name</button>
+
 		<div class="canvasHolder">
-			<canvas style="border-style:solid;" id="canvas" height = 551 width = 551 ></canvas>
+			<canvas onclick="stopAnimation()" style="border-style:solid;" id="canvas" height = 551 width = 551 ></canvas>
 		</div>
 	</body>
-		<script src="/templates/canvas.js" defer></script>
 </html>
