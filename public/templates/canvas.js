@@ -62,7 +62,7 @@ function start(){
 	ctx = canvas.getContext('2d');
 	var boxes = document.getElementById('inputbox').value;
 	for (var y = 1; y < boxes; y++){
-		objs.push(new shapeCreator.Circle());
+		objs.push(new circleCreator.Circle());
 	}
 
 	animation = window.requestAnimationFrame(draw);
